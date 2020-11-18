@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task</title>
+    <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>window.jQuery || document.write(decodeURIComponent('%3Cscript src="js/jquery.min.js"%3E%3C/script%3E'))</script>
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/20.2.3/css/dx.common.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/20.2.3/css/dx.light.css" />
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn3.devexpress.com/jslib/20.2.3/js/dx.all.js"></script>
+</head>
+
+<body>
+    <form method='POST' action="/sofs" autocomplete="off">
+        <label for="select">Select SOF: </label>
+        <div id='dropDown'>
+            <input type="text" id='myInput' name='select'>
+            <div id='dropDown-values'>
+            </div>
+        </div>
+        <input type="submit" value="select">
+    </form>
+
+    {{#if sof}}
+    <script>
+        var sofNo = window.location.href.split("/")[4];
+        $('#myInput').val(sofNo);
+        $.post('/sofs/data', { sofNo: sofNo }, function (data) {
+            $("#gridContainer").dxDataGrid({
+                dataSource: data,
+                searchPanel: {
+                    visible: true,
+                },
+                columns: [
+                    { dataField: 'DATE_TIME', sortIndex: 1, sortOrder: "asc" },
+                    { dataField: 'ORIGINAL_EVENT' },
+                    { dataField: 'STD_EVENT_CODE' },
+                    { dataField: 'STD_EVENT_NAME' },
+                ]
+            });
+        });
+    </script>
+    <h2>{{sof}}</h2>
+    <div id="gridContainer">
+    </div>
+    {{/if}}
+
+    <script>
+        $('#myInput').on('input', function () {
+            $('#dropDown-values').html("");
+            $.post("/", { val: $('#myInput').val() }, function (data) {
+                $('#dropDown-values').html("");
+                for (var i = 0; i < data.length; i++) {
+                    $('#dropDown-values').append("<p onClick='select(this)'>" + data[i].DAD_DA_Reference + "</p>");
+                }
+            });
+        });
+
+        $('#myInput').on('click', function () {
+            $.get("/all", function (data) {
+                var dropDownVal = document.getElementById('dropDown-values');
+                if (dropDownVal.innerHTML <= 13)
+                    for (var i = 0; i < data.length; i++) {
+                        $('#dropDown-values').append("<p onClick='select(this)'>" + data[i].DAD_DA_Reference + "</p>");
+                    }
+            })
+        });
+
+        function select(object) {
+            var input = document.getElementById('myInput');
+            var dropValues = document.getElementById('dropDown-values');
+            input.value = object.innerHTML;
+            dropValues.innerHTML = '';
+        }
+    </script>
+</body>
+
+</html>

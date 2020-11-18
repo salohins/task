@@ -1,0 +1,18 @@
+body {
+	margin: 3rem;
+	font-family: sans-serif;
+}
+
+p {
+	cursor: pointer;
+}
+
+form {
+	display: flex;
+	width: 350px;
+	justify-content: space-between;
+}
+
+input[type='submit'] {
+	height: 20px;
+}
